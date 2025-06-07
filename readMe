@@ -1,1 +1,15 @@
-Hi this is the modified tetris game
+please try the game using the game link. DO NOT CLICK SUBMIT FOR SURVEY
+
+
+
+Changes required- top to bottom
+1. correct issues with brick snapping. make the game board more visible (ie) thicker box outlines, the ones in white
+2. bring calculator, notes, and KPI tab in the same level as the game board
+3. enable brick rotation in all directions
+4. screen size optimization
+5. compatible with Mac
+6. phone compatible ? maybe
+7. make code more modular ? maybe
+8. training page - completely filled with bugs, example - tiles moving out of board when resizing
+9. arrow keys mapping - for rotating tiles, currently process = double click on tile, then press only right or left arrow. should use all arrows
+10. any way to make drag n drop of tiles easier??
