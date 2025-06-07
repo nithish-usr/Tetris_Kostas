@@ -1,0 +1,450 @@
+// Survey Page Component
+const SurveyPage = ({ 
+  surveyTimeLeft, 
+  allChatMessages, 
+  allCalculations, 
+  formatDateToUKTime, 
+  getBrowserInfo, 
+  getDeviceType, 
+  formatMatrixForLogging, 
+  frameMatrix, 
+  GAME_DURATION_SECONDS, 
+  timeLeft, 
+  totalValue, 
+  kpi1, 
+  kpi2, 
+  coverage, 
+  valuePerCell, 
+  fitness,
+  participantId 
+}) => {
+  const [surveyData, setSurveyData] = useState({
+    satisfaction: '',
+    difficulty: '',
+    clarity: '',
+    timeAdequacy: '',
+    strategyUsed: '',
+    mostChallenging: '',
+    improvements: '',
+    overallExperience: '',
+    additionalComments: ''
+  });
+
+  const [errors, setErrors] = useState({});
+
+  const formatSurveyTime = (seconds) => {
+    const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+    const s = String(seconds % 60).padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
+  const handleInputChange = (field, value) => {
+    setSurveyData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    
+    // Clear error when user starts interacting
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: ''
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!surveyData.satisfaction) {
+      newErrors.satisfaction = 'Please rate your satisfaction';
+    }
+    
+    if (!surveyData.difficulty) {
+      newErrors.difficulty = 'Please rate the difficulty';
+    }
+    
+    if (!surveyData.clarity) {
+      newErrors.clarity = 'Please rate the clarity';
+    }
+    
+    if (!surveyData.timeAdequacy) {
+      newErrors.timeAdequacy = 'Please indicate if time was adequate';
+    }
+    
+    if (!surveyData.overallExperience) {
+      newErrors.overallExperience = 'Please rate your overall experience';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    if (validateForm()) {
+      // Aggregate all game data with survey responses
+      const aggregatedNotes = allChatMessages.map(message => 
+        `[${message.date} ${message.timestamp}] ${message.text}`
+      ).join(' | ');
+
+      const aggregatedCalculations = allCalculations.map(calculation => 
+        `[${calculation.date} ${calculation.timestamp}] ${calculation.expression}`
+      ).join(' | ');
+
+      // Log complete survey data with all game information
+      fetch('https://tetris-proxy.vercel.app/api/submit', {
+  method: 'POST',
+  body: JSON.stringify({
+    timestamp: formatDateToUKTime(new Date().toISOString()),
+    browser: getBrowserInfo(),
+    device: getDeviceType(),
+    type: "survey_completed",
+    participantId: participantId, // Use actual participant ID instead of empty string
+    email: '',
+    age: '',
+    gender: '',
+    education: '',
+    workExperience: '',
+    managementExperience: '',
+    gamingExperience: '',
+    tetrisExperience: '',
+    mentalCalculations: '',
+    mathsLiked: '',
+    id: null,
+    anchor: null,
+    frameMatrix: formatMatrixForLogging(frameMatrix),
+    duration: GAME_DURATION_SECONDS - timeLeft,
+    totalValue,
+    kpi1,
+    kpi2,
+    coverage,
+    valuePerCell,
+    fitness,
+    allNotes: aggregatedNotes,
+    noteCount: allChatMessages.length,
+    allCalculations: aggregatedCalculations,
+    calculationCount: allCalculations.length,
+    satisfaction: surveyData.satisfaction,
+    difficulty: surveyData.difficulty,
+    clarity: surveyData.clarity,
+    timeAdequacy: surveyData.timeAdequacy,
+    strategyUsed: surveyData.strategyUsed,
+    mostChallenging: surveyData.mostChallenging,
+    improvements: surveyData.improvements,
+    overallExperience: surveyData.overallExperience,
+    additionalComments: surveyData.additionalComments
+  }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).catch(error => {
+        console.error('Error logging survey:', error);
+      }).finally(() => {
+        alert('Thank you for completing the survey! You may now close this window.');
+      });
+    }
+  };
+
+  const baseInputStyle = {
+    width: '100%',
+    padding: '12px 16px',
+    border: '2px solid #ddd',
+    borderRadius: '8px',
+    fontSize: '16px',
+    fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    boxSizing: 'border-box',
+    transition: 'all 0.2s ease',
+    backgroundColor: '#fff',
+    color: '#2c3e50',
+    outline: 'none'
+  };
+
+  const selectStyle = {
+    ...baseInputStyle,
+    cursor: 'pointer',
+    appearance: 'none',
+    backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232c3e50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e")`,
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'right 12px center',
+    backgroundSize: '20px',
+    paddingRight: '45px'
+  };
+
+  const textareaStyle = {
+    ...baseInputStyle,
+    minHeight: '100px',
+    resize: 'vertical'
+  };
+
+  const labelStyle = {
+    display: 'block',
+    marginBottom: '8px',
+    fontWeight: '600',
+    color: '#2c3e50',
+    fontSize: '16px'
+  };
+
+  const fieldContainerStyle = {
+    marginBottom: '24px'
+  };
+
+  const errorTextStyle = {
+    color: '#dc3545',
+    fontSize: '14px',
+    marginTop: '6px',
+    fontWeight: '500'
+  };
+
+  return (
+    <div style={{
+      backgroundColor: '#fdf6e3',
+      minHeight: '100vh',
+      minWidth: '100vw',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      margin: 0,
+      padding: '40px',
+      fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+    }}>
+      <div style={{
+        maxWidth: '700px',
+        width: '100%',
+        backgroundColor: '#fff',
+        padding: '40px',
+        borderRadius: '20px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+        textAlign: 'left',
+        lineHeight: '1.6'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+          <h1 style={{
+            fontSize: '36px',
+            fontWeight: 'bold',
+            color: '#2c3e50',
+            margin: 0
+          }}>
+            <span role="img" aria-label="survey">📝</span> Post-Game Survey
+          </h1>
+          <div style={{ 
+            fontSize: '14px', 
+            color: '#666', 
+            fontWeight: 'normal',
+            textAlign: 'right'
+          }}>
+            ⏱️ {formatSurveyTime(surveyTimeLeft)}
+          </div>
+        </div>
+        
+        <p style={{ 
+          marginBottom: '30px', 
+          fontSize: '16px', 
+          color: '#2c3e50',
+          textAlign: 'center'
+        }}>
+          Please share your thoughts about the Tetris for Managers experience.
+        </p>
+
+        <form onSubmit={handleSubmit}>
+          <div style={fieldContainerStyle}>
+            <label style={labelStyle}>
+              How satisfied are you with your performance in the game? *
+            </label>
+            <select
+              value={surveyData.satisfaction}
+              onChange={(e) => handleInputChange('satisfaction', e.target.value)}
+              style={errors.satisfaction ? {...selectStyle, borderColor: '#dc3545'} : selectStyle}
+            >
+              <option value="">Please select...</option>
+              <option value="very-dissatisfied">Very Dissatisfied</option>
+              <option value="dissatisfied">Dissatisfied</option>
+              <option value="neutral">Neutral</option>
+              <option value="satisfied">Satisfied</option>
+              <option value="very-satisfied">Very Satisfied</option>
+            </select>
+            {errors.satisfaction && (
+              <div style={errorTextStyle}>
+                {errors.satisfaction}
+              </div>
+            )}
+          </div>
+
+          <div style={fieldContainerStyle}>
+            <label style={labelStyle}>
+              How would you rate the difficulty of the game? *
+            </label>
+            <select
+              value={surveyData.difficulty}
+              onChange={(e) => handleInputChange('difficulty', e.target.value)}
+              style={errors.difficulty ? {...selectStyle, borderColor: '#dc3545'} : selectStyle}
+            >
+              <option value="">Please select...</option>
+              <option value="very-easy">Very Easy</option>
+              <option value="easy">Easy</option>
+              <option value="moderate">Moderate</option>
+              <option value="difficult">Difficult</option>
+              <option value="very-difficult">Very Difficult</option>
+            </select>
+            {errors.difficulty && (
+              <div style={errorTextStyle}>
+                {errors.difficulty}
+              </div>
+            )}
+          </div>
+
+          <div style={fieldContainerStyle}>
+            <label style={labelStyle}>
+              How clear were the game instructions and objectives? *
+            </label>
+            <select
+              value={surveyData.clarity}
+              onChange={(e) => handleInputChange('clarity', e.target.value)}
+              style={errors.clarity ? {...selectStyle, borderColor: '#dc3545'} : selectStyle}
+            >
+              <option value="">Please select...</option>
+              <option value="very-unclear">Very Unclear</option>
+              <option value="unclear">Unclear</option>
+              <option value="neutral">Neutral</option>
+              <option value="clear">Clear</option>
+              <option value="very-clear">Very Clear</option>
+            </select>
+            {errors.clarity && (
+              <div style={errorTextStyle}>
+                {errors.clarity}
+              </div>
+            )}
+          </div>
+
+          <div style={fieldContainerStyle}>
+            <label style={labelStyle}>
+              Was the 15-minute time limit adequate for completing the game? *
+            </label>
+            <select
+              value={surveyData.timeAdequacy}
+              onChange={(e) => handleInputChange('timeAdequacy', e.target.value)}
+              style={errors.timeAdequacy ? {...selectStyle, borderColor: '#dc3545'} : selectStyle}
+            >
+              <option value="">Please select...</option>
+              <option value="too-short">Too Short</option>
+              <option value="adequate">Adequate</option>
+              <option value="too-long">Too Long</option>
+            </select>
+            {errors.timeAdequacy && (
+              <div style={errorTextStyle}>
+                {errors.timeAdequacy}
+              </div>
+            )}
+          </div>
+
+          <div style={fieldContainerStyle}>
+            <label style={labelStyle}>
+              What strategy did you use to maximize your net value?
+            </label>
+            <textarea
+              value={surveyData.strategyUsed}
+              onChange={(e) => handleInputChange('strategyUsed', e.target.value)}
+              placeholder="Describe your approach to placing bricks and maximizing net value..."
+              style={textareaStyle}
+            />
+          </div>
+
+          <div style={fieldContainerStyle}>
+            <label style={labelStyle}>
+              What was the most challenging aspect of the game?
+            </label>
+            <textarea
+              value={surveyData.mostChallenging}
+              onChange={(e) => handleInputChange('mostChallenging', e.target.value)}
+              placeholder="What did you find most difficult or frustrating?"
+              style={textareaStyle}
+            />
+          </div>
+
+          <div style={fieldContainerStyle}>
+            <label style={labelStyle}>
+              What improvements would you suggest for this game?
+            </label>
+            <textarea
+              value={surveyData.improvements}
+              onChange={(e) => handleInputChange('improvements', e.target.value)}
+              placeholder="Any suggestions for making the game better?"
+              style={textareaStyle}
+            />
+          </div>
+
+          <div style={fieldContainerStyle}>
+            <label style={labelStyle}>
+              Overall, how would you rate your experience with Tetris for Managers? *
+            </label>
+            <select
+              value={surveyData.overallExperience}
+              onChange={(e) => handleInputChange('overallExperience', e.target.value)}
+              style={errors.overallExperience ? {...selectStyle, borderColor: '#dc3545'} : selectStyle}
+            >
+              <option value="">Please select...</option>
+              <option value="1">1 - Poor</option>
+              <option value="2">2 - Fair</option>
+              <option value="3">3 - Good</option>
+              <option value="4">4 - Very Good</option>
+              <option value="5">5 - Excellent</option>
+            </select>
+            {errors.overallExperience && (
+              <div style={errorTextStyle}>
+                {errors.overallExperience}
+              </div>
+            )}
+          </div>
+
+          <div style={fieldContainerStyle}>
+            <label style={labelStyle}>
+              Any additional comments or feedback?
+            </label>
+            <textarea
+              value={surveyData.additionalComments}
+              onChange={(e) => handleInputChange('additionalComments', e.target.value)}
+              placeholder="Share any other thoughts about your experience..."
+              style={textareaStyle}
+            />
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: '40px' }}>
+            <button
+              type="submit"
+              style={{
+                backgroundColor: '#007bff',
+                color: 'white',
+                padding: '16px 32px',
+                borderRadius: '12px',
+                fontWeight: '600',
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(0,123,255,0.3)',
+                fontSize: '18px',
+                transition: 'all 0.2s ease',
+                fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = '#0056b3';
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = '0 6px 16px rgba(0,123,255,0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = '#007bff';
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 4px 12px rgba(0,123,255,0.3)';
+              }}
+            >
+              Submit Survey
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+
+export default SurveyPage;
