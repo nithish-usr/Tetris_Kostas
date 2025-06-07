@@ -1,0 +1,98 @@
+// Welcome Page Component
+const WelcomePage = ({ onStart }) => {
+  return (
+    <div style={{
+      backgroundColor: '#fdf6e3',
+      minHeight: '100vh',
+      minWidth: '100vw',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      margin: 0,
+      padding: '40px',
+      color: '#000',
+      fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+    }}>
+      <div style={{
+        maxWidth: '800px',
+        backgroundColor: '#fff',
+        padding: '40px',
+        borderRadius: '20px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+        textAlign: 'left',
+        lineHeight: '1.6'
+      }}>
+        <h1 style={{
+          fontSize: '36px',
+          fontWeight: 'bold',
+          color: '#2c3e50',
+          marginBottom: '30px',
+          textAlign: 'center'
+        }}>
+          <span role="img" aria-label="tetris">🧱</span> Tetris for Managers
+        </h1>
+        
+        <div style={{ fontSize: '16px', color: '#2c3e50', marginBottom: '30px' }}>
+          <p style={{ marginBottom: '25px', fontSize: '18px', fontWeight: '500' }}>
+            Welcome to <strong>Tetris for Managers</strong>, a strategic twist on the classic game.
+          </p>
+          
+          <p style={{ marginBottom: '20px' }}>
+            In this version, you will drag and drop bricks of different shapes into a frame. Each brick has a <strong>dollar value</strong>, representing its potential contribution to your portfolio.
+          </p>
+          
+          <p style={{ marginBottom: '20px' }}>
+            Your challenge is to <strong>build smart</strong>: bricks must fit entirely <strong>within the frame</strong> and <strong>cannot overlap</strong>. Here's the strategic element: <strong>every empty cell</strong> left in the frame comes with a <strong>$1 penalty</strong>. Please stay focused and avoid talking to others during play. If you have a question at any point, just raise your hand and I will be happy to help.
+          </p>
+          
+          <p style={{ marginBottom: '20px' }}>
+            This game includes three phases: the <strong>training phase</strong>, <strong>registration phase</strong>, and the <strong>game phase</strong>.
+          </p>
+          
+          <ol style={{ paddingLeft: '20px', marginBottom: '20px' }}>
+            <li style={{ marginBottom: '10px' }}>
+              In the <strong>training phase</strong>, you will be given the opportunity to become familiar with the interface by solving a simpler version of the game.
+            </li>
+            <li style={{ marginBottom: '10px' }}>
+              In the <strong>registration phase</strong>, you will provide some basic information about yourself.
+            </li>
+            <li style={{ marginBottom: '10px' }}>
+              In the <strong>game phase</strong>, you will have <strong>15 minutes</strong> to achieve the highest net value possible of the game. You will also fill out a short survey after the game is over.
+            </li>
+          </ol>
+          
+          <p style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#e8f5e8', borderRadius: '8px', borderLeft: '4px solid #28a745' }}>
+            <strong>💰 Incentives:</strong> The participant with the highest net value will receive a $100 cash prize. In the event of a tie, the prize will go to the participant who completed the game in less time.
+          </p>
+          
+          
+        </div>
+        
+        <div style={{ textAlign: 'center' }}>
+          <button
+            onClick={onStart}
+            style={{
+              backgroundColor: '#007bff',
+              color: 'white',
+              padding: '15px 30px',
+              borderRadius: '10px',
+              fontWeight: 'bold',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(0,123,255,0.3)',
+              fontSize: '18px',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#0056b3'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#007bff'}
+          >
+            Start Training Phase
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}; // End of WelcomePage component
+
+export default WelcomePage;
